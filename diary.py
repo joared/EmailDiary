@@ -3,12 +3,16 @@ import datetime
 class Entry:
     def __init__(self, raw_entry):
         self.date, self.text = self._parse(raw_entry)
+        self.people = get_tags_from_entry(self.text, "@")
+        self.tags = get_tags_from_entry(self.text, "#")
         
     def _parse(self, raw_entry):
         raw_entry = raw_entry.strip()
         #print("Date string: " + raw_entry[:raw_entry.find("\n")])
         date_string = raw_entry.split()[1]
-        date = datetime.datetime(*map(int, date_string.split("/")))
+        day, month, year = map(int, date_string.split("/"))
+        year += 2000
+        date = datetime.datetime(year, month, day)
         text = raw_entry[raw_entry.index(date_string) + len(date_string):].strip()
         return date, text
 

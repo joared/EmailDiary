@@ -40,6 +40,12 @@ def _show_tags(diary, tag_symbol):
     for i, n in enumerate(diary.get_tags(tag_symbol)):
         print("{}. {}".format(i+1, n))
 
+def show_entries_by_tag(diary):
+    tag = input("Tag: ")
+    for entry in diary.entries:
+        if tag in entry.people + entry.tags:
+            print("{} - {}".format(entry.date.date(), entry.text[:50].replace("\n", " ")))
+
 if __name__ == "__main__":
     """
     search operators: https://support.google.com/mail/answer/7190?hl=sv
@@ -54,7 +60,7 @@ if __name__ == "__main__":
     #messages = choose_msg(service, user_id, message_ids)
     d = get_diary(service, user_id, message_ids)
     
-    choices = [show_entries, show_people, show_tags]
+    choices = [show_people, show_tags, show_entries, show_entries_by_tag]
     l = len(choices)
     while True:
         print("What you wanna do?")
