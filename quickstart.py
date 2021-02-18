@@ -8,41 +8,15 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 import base64
 
-from lxml.html.clean import clean_html
+#from lxml.html.clean import clean_html
 import re
+import string
 
 def cleantext(raw_html):
     #return clean_html(raw_html)
-    cleant = cleanhtml(raw_html)
+    cleantxt = cleanhtml(raw_html)
     #cleant = raw_html
     
-    cleantxt = cleant
-    """
-    cleantxt = ""
-    skip = False
-    for c in cleant:
-        if c == "\n" and cleantxt[-2] == "=":
-            print("some text " + cleantxt[-1] + "to illustrate")
-            print(cleantxt[-1] == "\r")
-            print("Removed = enter: {}{}".format(cleantxt[-1], cleantxt[-2]))
-            cleantxt = cleantxt[:-2]
-        else:
-            cleantxt += c
-    """
-    """
-    for c in cleant:
-        if not skip and c == "&":
-            skip = True
-        elif skip:
-            if c == ";":
-                skip = False
-        else:
-            cleantxt += c
-            
-        if cleantxt[-6:] == "--Sent":
-            cleantxt = cleantxt[:-6]
-            break
-    """
     cleantxt = cleantxt.replace("=\r\n", "")
     cleantxt = cleantxt.replace("\r", " ")
     cleantxt = cleantxt.replace("p, li { white-space: pre-wrap; }", "")
@@ -51,7 +25,25 @@ def cleantext(raw_html):
         , "")
     cleantxt = cleantxt.replace("&quot;", "'")
     cleantxt = cleantxt.strip()
-    return cleantxt.split("=E2=80=A2 =E2=80=A2 =E2=80=A2")
+
+    # new page
+    cleantxt = cleantxt.replace("=E2=80=A2 =E2=80=A2 =E2=80=A2", "")
+    ls = []
+    for s in cleantxt.split("\n"):
+        if s.strip() != "":
+            ls.append(s.strip())
+
+    # handle multiple pages when same entry continues on next page
+    new_ls = []
+    part_entry = ""
+    for i, t in enumerate(ls): 
+        part_entry += " " + t.strip()
+        if t[-1] not in string.ascii_lowercase + string.ascii_uppercase:
+            new_ls.append(part_entry)
+            part_entry = ""
+
+
+    return "\n".join(new_ls)
 
 def cleanhtml(raw_html):
   #cleanr = re.compile(r"<.*?>") # doesn't work
